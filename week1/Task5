@@ -1,0 +1,6 @@
+INSERT INTO Course VALUES 
+('CS101', 'Database Management', 101, '1MS23CS001', 'prof_smith@vtu.edu'),
+('IS202', 'Data Structures', 102, '1MS23CS002', 'prof_jones@vtu.edu'),
+('CS103', 'Operating Systems', 101, '1MS23CS003', 'prof_smith@vtu.edu'),
+('EC301', 'Digital Electronics', 103, '1MS23CS004', 'prof_kumar@vtu.edu'),
+('IS204', 'Web Programming', 104, '1MS23CS005', 'prof_leila@vtu.edu');
