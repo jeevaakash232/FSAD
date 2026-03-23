@@ -1,0 +1,4 @@
+SELECT Department, COUNT(*) as Total_Students 
+FROM Student 
+GROUP BY Department 
+HAVING COUNT(*) > 1;
