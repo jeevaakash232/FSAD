@@ -1,0 +1,2 @@
+SELECT * FROM Student;
+SELECT * FROM Course;
