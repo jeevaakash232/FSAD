@@ -1,0 +1,6 @@
+INSERT INTO Student VALUES 
+('1MS23CS001', 'Arjun Kumar', 'arjun@mail.com', '9845011223', 'CSE'),
+('1MS23CS002', 'Sneha Rao', 'sneha@mail.com', '9845022334', 'IT'),
+('1MS23CS003', 'Rahul Nair', 'rahul@mail.com', '9845033445', 'CSE'),
+('1MS23CS004', 'Priya Das', 'priya@mail.com', '9845044556', 'ECE'),
+('1MS23CS005', 'Amit Singh', 'amit@mail.com', '9845055667', 'IT');
