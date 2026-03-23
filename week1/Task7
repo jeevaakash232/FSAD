@@ -1,0 +1,1 @@
+SELECT * FROM Course ORDER BY Course_Name ASC;
