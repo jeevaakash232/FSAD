@@ -1,0 +1,2 @@
+SELECT COUNT(*) AS Total_Students FROM Student;
+SELECT COUNT(DISTINCT Department) AS Department_Count FROM Student;
