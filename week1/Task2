@@ -1,0 +1,7 @@
+CREATE TABLE Student (
+    VTU_Number VARCHAR(20) PRIMARY KEY,
+    Name VARCHAR(100),
+    Email VARCHAR(100),
+    Phone VARCHAR(15),
+    Department VARCHAR(50)
+);
