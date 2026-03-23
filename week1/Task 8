@@ -1,0 +1,1 @@
+SELECT Name, Email FROM Student WHERE Email LIKE '%@mail.com';
