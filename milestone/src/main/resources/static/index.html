@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Event Synchronization Engine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="light-mode">
+    <div class="container">
+        <header>
+            <h1>Real-Time Event Synchronization Engine</h1>
+        </header>
+
+        <!-- Statistics Dashboard -->
+        <div class="stats-dashboard">
+            <div class="stat-card info-card">
+                <div class="stat-icon">ℹ️</div>
+                <div class="stat-content">
+                    <div class="stat-label">Info</div>
+                    <div class="stat-value" id="stat-info">0</div>
+                </div>
+            </div>
+            <div class="stat-card warning-card">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-content">
+                    <div class="stat-label">Warning</div>
+                    <div class="stat-value" id="stat-warning">0</div>
+                </div>
+            </div>
+            <div class="stat-card alert-card">
+                <div class="stat-icon">🚨</div>
+                <div class="stat-content">
+                    <div class="stat-label">Alert</div>
+                    <div class="stat-value" id="stat-alert">0</div>
+                </div>
+            </div>
+            <div class="stat-card critical-card">
+                <div class="stat-icon">🔴</div>
+                <div class="stat-content">
+                    <div class="stat-label">Critical</div>
+                    <div class="stat-value" id="stat-critical">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="systems-grid">
+            <div class="system-card" data-system="Smart-Home-Monitor">
+                <h2>Smart Home Monitor</h2>
+                <div class="system-status">
+                    <span class="status-indicator"></span>
+                    <span class="status-text">Active</span>
+                </div>
+                <div class="event-count">
+                    <div class="count-label">Total Events</div>
+                    <div class="count-value" id="count-smart-home">0</div>
+                </div>
+                <canvas id="chart-smart-home" class="event-chart"></canvas>
+                <div class="system-health">
+                    <span class="health-label">Last Event:</span>
+                    <span class="health-value" id="health-smart-home">Never</span>
+                </div>
+                <div class="event-list" id="events-smart-home"></div>
+            </div>
+
+            <div class="system-card" data-system="Industrial-Sensor-Network">
+                <h2>Industrial Sensor Network</h2>
+                <div class="system-status">
+                    <span class="status-indicator"></span>
+                    <span class="status-text">Active</span>
+                </div>
+                <div class="event-count">
+                    <div class="count-label">Total Events</div>
+                    <div class="count-value" id="count-industrial">0</div>
+                </div>
+                <canvas id="chart-industrial" class="event-chart"></canvas>
+                <div class="system-health">
+                    <span class="health-label">Last Event:</span>
+                    <span class="health-value" id="health-industrial">Never</span>
+                </div>
+                <div class="event-list" id="events-industrial"></div>
+            </div>
+
+            <div class="system-card" data-system="Environmental-Monitoring">
+                <h2>Environmental Monitoring</h2>
+                <div class="system-status">
+                    <span class="status-indicator"></span>
+                    <span class="status-text">Active</span>
+                </div>
+                <div class="event-count">
+                    <div class="count-label">Total Events</div>
+                    <div class="count-value" id="count-environmental">0</div>
+                </div>
+                <canvas id="chart-environmental" class="event-chart"></canvas>
+                <div class="system-health">
+                    <span class="health-label">Last Event:</span>
+                    <span class="health-value" id="health-environmental">Never</span>
+                </div>
+                <div class="event-list" id="events-environmental"></div>
+            </div>
+
+            <div class="system-card" data-system="Vehicle-Tracking-System">
+                <h2>Vehicle Tracking System</h2>
+                <div class="system-status">
+                    <span class="status-indicator"></span>
+                    <span class="status-text">Active</span>
+                </div>
+                <div class="event-count">
+                    <div class="count-label">Total Events</div>
+                    <div class="count-value" id="count-vehicle">0</div>
+                </div>
+                <canvas id="chart-vehicle" class="event-chart"></canvas>
+                <div class="system-health">
+                    <span class="health-label">Last Event:</span>
+                    <span class="health-value" id="health-vehicle">Never</span>
+                </div>
+                <div class="event-list" id="events-vehicle"></div>
+            </div>
+        </div>
+
+        <div class="all-events-section">
+            <h2>All System Events (Real-Time)</h2>
+            <div id="all-events" class="all-events-list"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
