@@ -1,0 +1,430 @@
+AIM:
+To develop a Student CRUD (Create, Read, Update, Delete) application using Spring Boot and Spring Data JPA. The student table should be mapped using JPA annotations such as @Entity, @Id, @Table, and @Column, and CRUD operations 
+must be performed on a relational database through controllers, services, and repository layers.
+
+PROCEDURE
+Create a Spring Boot project
+Add dependencies for:
+Spring Web
+Spring Data JPA
+MySQL Driver (or any RDBMS)
+Thymeleaf (for UI)
+Configure Database Connection
+Inside application.properties, configure:
+Database URL
+Username
+Password
+JPA Hibernate settings
+DDL auto strategy (ex: update)
+
+Create the project package structure
+As given:
+
+controller/
+service/
+repository/
+entity/
+templates/students/
+Create the Student Entity
+Use annotations:
+@Entity
+@Table(name="students")
+@Id + @GeneratedValue
+@Column for fields
+This maps the Student class to the database table.
+
+Create StudentRepository
+Extend:
+
+public interface StudentRepository extends JpaRepository<Student, Long> { }
+
+Spring Data JPA automatically generates CRUD operations.
+
+Create Service Layer
+Interface StudentService
+Implementation StudentServiceImpl
+Inject repository using @Autowired
+Define methods:
+saveStudent()
+getAllStudents()
+getStudentById()
+deleteStudent()
+Create StudentController
+Annotate with @Controller
+Map HTTP requests using @GetMapping / @PostMapping
+Handle:
+Display students list
+Show form
+Insert new student
+Update existing student
+Delete student
+Create Thymeleaf Templates
+Inside templates/students/:
+list.html → display student table
+form.html → input form for add/update
+
+Run the Application using:
+
+Task10Application.java
+
+Spring Boot will automatically:
+
+Create the table (if using spring.jpa.hibernate.ddl-auto=update)
+Start server at http://localhost:8080/
+Test CRUD Operations
+Perform the following through UI:
+Add a student
+View all students
+Update details
+Delete student
+Data should reflect correctly in the database.
+
+
+code:
+
+Task10ApplicationTests.java
+
+package edu.Task_10;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+@SpringBootApplication
+public class Task10Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Task10Application.class, args);
+	}
+}
+
+StudentController.java
+
+package edu.Task_10.Controller;
+import edu.Task_10.Entity.*;
+import edu.Task_10.service.*;
+import jakarta.validation.Valid;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+@Controller
+@RequestMapping("/students")
+public class StudentController {
+
+    private final StudentService service;
+
+    public StudentController(StudentService service) {
+        this.service = service;
+    }
+    @GetMapping
+    public String listStudents(Model model) {
+        model.addAttribute("students", service.getAll());
+        return "students/list";
+    }
+    @GetMapping("/new")
+    public String showCreateForm(Model model) {
+        model.addAttribute("student", new Student());
+        return "students/form";
+    }
+    @PostMapping
+    public String create(@Valid @ModelAttribute("student") Student student,
+                         BindingResult result) {
+        if (result.hasErrors()) return "students/form";
+        service.create(student);
+        return "redirect:/students";
+    }
+    @GetMapping("/{id}/edit")
+    public String showEditForm(@PathVariable Long id, Model model) {
+        model.addAttribute("student", service.getById(id));
+        return "students/form";
+    }
+    @PostMapping("/{id}")
+    public String update(@PathVariable Long id,
+                         @Valid @ModelAttribute("student") Student student,
+                         BindingResult result) {
+        if (result.hasErrors()) return "students/form";
+        service.update(id, student);
+        return "redirect:/students";
+    }
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id) {
+        service.delete(id);
+        return "redirect:/students";
+    }
+}
+
+Student.java
+
+package edu.Task_10.Entity;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.*;
+@Entity
+@Table(name = "students")
+public class Student {
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+@Column(name = "student_id")
+	    private Long id;
+	    @NotBlank(message = "Name is required")
+	    @Column(name = "name", nullable = false, length = 80)
+	    private String name;
+	    @Email(message = "Enter a valid email")
+	    @NotBlank(message = "Email is required")
+	    @Column(name = "email", nullable = false, unique = true, length = 120)
+	    private String email;
+	    @Column(name = "department", length = 60)
+	    private String department;
+	    public Student() {}
+	    public Student(Long id, String name, String email, String department) {
+	        this.id = id;
+	        this.name = name;
+	        this.email = email;
+	        this.department = department;
+	    }
+	    public Long getId() { return id; }
+	    public void setId(Long id) { this.id = id; }
+	    public String getName() { return name; }
+	    public void setName(String name) { this.name = name; }
+	    public String getEmail() { return email; }
+	    public void setEmail(String email) { this.email = email; }
+	    public String getDepartment() { return department; }
+	    public void setDepartment(String department) { this.department = department; }
+	}
+	
+StudentRepository.java
+
+package edu.Task_10.repository;
+import edu.Task_10.Entity.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+public interface StudentRepository extends JpaRepository<Student, Long> {
+    Optional<Student> findByEmail(String email);
+}
+StudentService.java
+package edu.Task_10.service;
+import edu.Task_10.Entity.*;
+import java.util.List;
+public interface StudentService {
+    List<Student> getAll();
+    Student getById(Long id);
+    Student create(Student student);
+    Student update(Long id, Student student);
+    void delete(Long id);
+}
+
+StudentService.java
+
+package edu.Task_10.service;
+import edu.Task_10.Entity.*;
+import edu.Task_10.repository.*;
+import edu.Task_10.service.*;
+import java.util.List;
+import org.springframework.stereotype.Service;
+@Service
+public class StudentServiceImpl implements StudentService {
+    private final StudentRepository repo;
+    public StudentServiceImpl(StudentRepository repo) {
+        this.repo = repo;
+    }
+    @Override
+    public List<Student> getAll() {
+        return repo.findAll();
+    }
+    @Override
+    public Student getById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found: " + id));
+    }
+    @Override
+    public Student create(Student student) {
+        repo.findByEmail(student.getEmail()).ifPresent(s -> {
+            throw new RuntimeException("Email already exists: " + student.getEmail());
+        });
+        return repo.save(student);
+    }
+    @Override
+    public Student update(Long id, Student student) {
+        Student existing = getById(id);
+        existing.setName(student.getName());
+        existing.setEmail(student.getEmail());
+        existing.setDepartment(student.getDepartment());
+        return repo.save(existing);
+    }
+    @Override
+    public void delete(Long id) {
+        if (!repo.existsById(id)) {
+            throw new RuntimeException("Student not found: " + id);
+        }
+        repo.deleteById(id);
+    }
+}
+
+Form.html
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Student Form</title>
+  <meta charset="UTF-8"/>
+</head>
+<body>
+<h2 th:text="${student.id == null ? 'Create Student' : 'Edit Student'}"></h2>
+<form th:action="${student.id == null} ? @{/students} : @{/students/{id}(id=${student.id})}"
+      th:object="${student}"
+      method="post">
+  <div>
+    <label>Name:</label>
+    <input type="text" th:field="*{name}"/>
+    <small style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+  </div>
+  <div>
+    <label>Email:</label>
+    <input type="text" th:field="*{email}"/>
+    <small style="color:red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+  </div>
+  <div>
+    <label>Department:</label>
+    <input type="text" th:field="*{department}"/>
+  </div>
+  <br/>
+  <button type="submit">Save</button>
+  <a th:href="@{/students}">Cancel</a>
+</form>
+</body>
+</html>
+
+List.html
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Students</title>
+  <meta charset="UTF-8"/>
+  <style>
+    table { border-collapse: collapse; width: 80%; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    a, button { margin-right: 6px; }
+  </style>
+</head>
+<body>
+<h2>Student List</h2>
+<a th:href="@{/students/new}">+ Add Student</a>
+<table>
+  <thead>
+  <tr>
+    <th>ID</th><th>Name</th><th>Email</th><th>Department</th><th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="s : ${students}">
+    <td th:text="${s.id}"></td>
+    <td th:text="${s.name}"></td>
+    <td th:text="${s.email}"></td>
+    <td th:text="${s.department}"></td>
+    <td>
+      <a th:href="@{/students/{id}/edit(id=${s.id})}">Edit</a>
+      <form th:action="@{/students/{id}/delete(id=${s.id})}" method="post" style="display:inline;">
+        <button type="submit" onclick="return confirm('Delete this student?')">Delete</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>
+
+Create DB:
+CREATE DATABASE studentdb;
+
+Application.properties
+
+spring.application.name=Task_10
+spring.datasource.url=jdbc:mysql://localhost:3306/studentdb?useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=mySQL@123
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.thymeleaf.cache=false
+server.port=8080
+
+
+pom.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.0.3</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>edu</groupId>
+	<artifactId>Task_10</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Task_10</name>
+	<description>Demo project for Spring Boot</description>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<java.version>21</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency> 
+    <dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>    
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+
+
+RESULT:
+Thus, a complete Student CRUD application was successfully developed using Spring Boot and Spring Data JPA.The Student entity was mapped to a relational database using JPA annotations such as @Entity, @Id, @Table, and @Column.
+CRUD operations including Create, Read, Update, and Delete were performed through controller methods, service layer logic, repository interface, and Thymeleaf views.The application executed successfully and interacted with the database through Spring Boot’s auto-configuration and JPA.
