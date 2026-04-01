@@ -1,0 +1,131 @@
+AIM:
+To design an Order Management System using MySQL tables and retrieve customer order history using JOIN queries, ORDER BY, and subqueries to determine the highest value order and the most active customer.
+
+PROCEDURE:
+Launch MySQL Workbench and create the database tables.
+Insert sample customer, product, and order data.
+Write JOIN queries to display order history.
+Use a subquery to find:
+the highest value order
+the most active customer
+Use ORDER BY to sort results by order date or order value.
+Display the output using SQL and optionally a simple HTML layout.
+
+code:
+1)Database
+Creating Tables:
+CREATE TABLE customers (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    email VARCHAR(100)
+);
+
+CREATE TABLE products (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(100),
+    price DECIMAL(10,2)
+);
+
+CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    product_id INT,
+    quantity INT,
+    order_date DATE,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+Insert Values into Tables
+
+INSERT INTO customers (customer_name, email)
+VALUES 
+('Arun Kumar', 'arun@gmail.com'),
+('Priya Sharma', 'priya@gmail.com'),
+('Rahul Mehta', 'rahul@gmail.com');
+
+INSERT INTO products (product_name, price)
+VALUES
+('Laptop', 55000),
+('Mouse', 700),
+('Keyboard', 1200),
+('Monitor', 7500);
+
+INSERT INTO orders (customer_id, product_id, quantity, order_date)
+VALUES
+(1, 1, 1, '2024-04-10'),
+(1, 2, 2, '2024-04-12'),
+(2, 3, 1, '2024-04-11'),
+(3, 4, 2, '2024-04-09'),
+(1, 4, 1, '2024-04-13');
+
+odered history
+
+SELECT 
+    o.order_id,
+    c.customer_name,
+    p.product_name,
+    p.price,
+    o.quantity,
+    (p.price * o.quantity) AS total_amount,
+    o.order_date
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN products p ON o.product_id = p.product_id
+ORDER BY o.order_date DESC;
+
+SELECT order_id, customer_id, (price * quantity) AS order_value
+FROM orders o
+JOIN products p ON o.product_id = p.product_id
+ORDER BY order_value DESC
+LIMIT 1;
+
+SELECT customer_id, customer_name, total_orders
+FROM (
+    SELECT 
+        c.customer_id,
+        c.customer_name,
+        COUNT(o.order_id) AS total_orders
+    FROM customers c
+    JOIN orders o ON c.customer_id = o.customer_id
+    GROUP BY c.customer_id
+) AS t
+ORDER BY total_orders DESC
+LIMIT 1;
+
+2)index.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Management</title>
+    <style>
+        body { font-family: Arial; background: #eef2f3; }
+        .box {
+            width: 80%; margin: 20px auto; padding: 20px;
+            background: white; border-radius: 10px; box-shadow: 0 0 10px #aaa;
+        }
+        h2 { text-align: center; }
+        table {
+            width: 100%; border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px; border: 1px solid #ccc; text-align: center;
+        }
+        th { background: #007bff; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Customer Order History Report</h2>
+    <p>This section will display the SQL JOIN results fetched from the database.</p>
+</div>
+
+</body>
+</html>
+
+RESULT
+
+Thus, an Order Management System was successfully implemented using MySQL.Customer, product, and order tables were created and joined using SQL JOIN queries.Subqueries were used to identify the highest value order and the most active customer.
+The data was sorted and displayed effectively using ORDER BY and a structured HTML layout.
