@@ -1,0 +1,217 @@
+AIM:
+To develop a basic Spring MVC application using annotation-based configuration only, without using web.xml or any Spring XML files. The application should include a controller to accept user requests and display employee details through the MVC architecture using Spring Boot and Thymeleaf templates.
+
+PROCEDURE:
+Create a Spring Boot project with the required dependencies:
+Spring Web
+Thymeleaf
+Create the package structure (Edu.Task_9) and add required classes:
+Task9Application.java (main class)
+Employee.java (model)
+EmployeeRepository.java (in-memory storage)
+EmployeeController.java (Spring MVC controller)
+Define the Employee model class
+Include fields such as id, name, and department.
+Provide constructors, getters, setters, and a toString() method.
+Create the EmployeeRepository
+Store employee records in memory using a list or map.
+Provide methods like findAll() and findById().
+Develop the EmployeeController class
+Annotate with @Controller.
+Map URLs using @GetMapping or @RequestMapping.
+Use Model to pass employee data to the view.
+Return Thymeleaf views such as home and employee.
+Create Thymeleaf Templates under src/main/resources/templates:
+home.html → entry page with a link to view employees
+employee.html → displays employee details dynamically
+Run the project using the Spring Boot main class (Task9Application).
+Open browser → visit:
+http://localhost:8080/employees
+Verify MVC Flow
+Controller receives request
+Repository provides data
+Controller sends data to view
+Thymeleaf renders the final HTML page
+
+code:
+
+1) Pom.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.0.2</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.example</groupId>
+	<artifactId>Task_9</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Task_9</name>
+	<description>Demo project for Spring Boot</description>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<java.version>21</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+
+2) Employee.java
+
+package edu.Task_9;
+public class Employee {
+    private int id;
+    private String name;
+    private String dept;
+    public Employee() {}
+    public Employee(int id, String name, String dept) {
+        this.id = id;
+        this.name = name;
+        this.dept = dept;
+    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDept() { return dept; }
+    public void setDept(String dept) { this.dept = dept; }
+}
+
+
+3) EmployeeController.java
+
+package edu.Task_9;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+@Controller
+public class EmployeeController {
+    @Autowired
+    private EmployeeRepository repo;
+    @GetMapping("/")
+    public String home() {
+        return "home";
+    }
+    @GetMapping("/employee")
+    public String getEmployee(@RequestParam("id") int id, Model model) {
+        Employee emp = repo.findById(id);
+        if (emp == null) {
+            model.addAttribute("error", "Employee not found for ID: " + id);
+            return "employee";
+        }
+        model.addAttribute("emp", emp);
+        return "employee";
+    }
+}
+
+4) EmployeeRepository.java
+
+package edu.Task_9;
+import org.springframework.stereotype.Component;
+import java.util.Map;
+@Component
+public class EmployeeRepository {
+    private final Map<Integer, Employee> store = Map.of(
+            101, new Employee(101, "Anand", "CSE"),
+            102, new Employee(102, "Divya", "ECE"),
+            103, new Employee(103, "Ravi", "IT")
+    );
+    public Employee findById(int id) {
+        return store.get(id);
+    }
+}
+
+5) Task9Application.java
+
+package edu.Task_9;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class Task9Application {
+	public static void main(String[] args) {
+		SpringApplication.run(Task9Application.class, args);
+	}
+
+}
+
+6) home.html
+
+<!DOCTYPE html>
+<html>
+<head><title>Employee Search</title></head>
+<body>
+  <h2>Employee Management (Spring MVC)</h2>
+  <form action="/employee" method="get">
+    Enter Employee ID:
+    <input type="number" name="id" required />
+    <button type="submit">Search</button>
+  </form>
+  <p>Try IDs: 101, 102, 103</p>
+</body>
+</html>
+
+7) employee.html
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Employee Details</title></head>
+<body>
+  <h2>Employee Details</h2>
+  <p th:if="${error != null}" th:text="${error}" style="color:red;"></p>
+  <div th:if="${emp != null}">
+    <p><b>ID:</b> <span th:text="${emp.id}"></span></p>
+    <p><b>Name:</b> <span th:text="${emp.name}"></span></p>
+    <p><b>Department:</b> <span th:text="${emp.dept}"></span></p>
+  </div>
+  <a href="/">Back</a>
+</body>
+</html>
+
+RESULT:
+Thus, a basic Spring MVC application was successfully developed using annotation-based configuration only, without any XML files. A controller was created to handle user requests, fetch data from the repository, and pass employee details to the Thymeleaf view.
+The application demonstrated the complete Spring MVC flow—Model, View, and Controller—using Spring Boot, annotations, and in-memory data storage.
