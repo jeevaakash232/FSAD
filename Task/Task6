@@ -1,0 +1,71 @@
+AIM:
+To create a database trigger that automatically logs every INSERT or UPDATE operation performed on a table, and to create a VIEW that displays daily activity reports. 
+This demonstrates how automated auditing is implemented in enterprise systems.
+
+PROCEDURE:
+Create a main table (employees) where data changes will occur.
+Create a log table (activity_log) to store audit details.
+Write a trigger that fires automatically on every:
+INSERT
+UPDATE
+Insert and update data to test the trigger.
+Create a VIEW to generate a daily summary of activity.
+Retrieve the view to display daily audit reports.
+
+code:
+Creating Tables
+
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(100),
+    salary DECIMAL(10,2),
+    updated_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE activity_log (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_id INT,
+    action_type VARCHAR(20),
+    old_salary DECIMAL(10,2),
+    new_salary DECIMAL(10,2),
+    log_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TRIGGER log_insert
+AFTER INSERT ON employees
+FOR EACH ROW
+INSERT INTO activity_log(emp_id, action_type, new_salary)
+VALUES (NEW.emp_id, 'INSERT', NEW.salary);
+
+CREATE TRIGGER log_update
+AFTER UPDATE ON employees
+FOR EACH ROW
+INSERT INTO activity_log(emp_id, action_type, old_salary, new_salary)
+VALUES (OLD.emp_id, 'UPDATE', OLD.salary, NEW.salary);
+
+Inserting and Updating values 
+
+INSERT INTO employees VALUES (1, 'Jeeva', 30000, NOW());
+
+UPDATE employees
+SET salary = 35000
+WHERE emp_id = 1;
+
+Creating Daily Activity Table
+
+CREATE VIEW daily_activity AS
+SELECT 
+    DATE(log_time) AS activity_date,
+    COUNT(*) AS total_actions,
+    SUM(CASE WHEN action_type='INSERT' THEN 1 ELSE 0 END) AS total_inserts,
+    SUM(CASE WHEN action_type='UPDATE' THEN 1 ELSE 0 END) AS total_updates
+FROM activity_log
+GROUP BY DATE(log_time);
+
+See the Daily Report
+
+SELECT * FROM daily_activity;
+
+RESULT:
+Thus, automated logging was successfully implemented using SQL Triggers that recorded every INSERT and UPDATE action performed on the employees table. 
+A VIEW was created to summarize daily database activities, enabling easy audit tracking and reporting. This simulates real-time enterprise auditing systems used in banking, HR, and large-scale applications.
