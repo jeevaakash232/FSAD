@@ -1,0 +1,96 @@
+AIM:
+To design an interactive feedback form using HTML, CSS, and JavaScript that validates user inputs on keypress, highlights form fields on mouse hover,
+and displays a confirmation message when the submit button is double-clicked.
+
+PROCEDURE:
+Create an HTML feedback form with fields:
+ .Name
+ .Email
+ .Feedback message
+Use CSS to style input fields and add hover effects.
+Write JavaScript functions for:
+ .Keypress validation (allow only letters for name, valid email characters)
+ .Dynamic field highlighting on mouseover
+ .Double-click event handling for submit confirmation
+Attach JavaScript events:
+ .onkeypress for live validation
+ .onmouseover & onmouseout for highlighting
+ .ondblclick for confirming submission
+Test the form for validation, hover effects, and double-click submission confirmation.
+
+code:
+<!DOCTYPE html>
+<html>
+<head>
+<title>Interactive Feedback Form</title>
+<style>
+body { font-family: Arial; background: #f4f4f4; }
+.container {
+    width: 350px; background: white; padding: 20px;
+    margin: 50px auto; border-radius: 10px;
+    box-shadow: 0 0 10px #999;
+}
+input, textarea {
+    width: 100%; padding: 8px; margin: 10px 0;
+    border: 2px solid #ccc; border-radius: 5px;
+}
+input:hover, textarea:hover {
+    border-color: #007bff;
+    background: #eef6ff;
+}
+button {
+    width: 100%; padding: 10px; background: #007bff;
+    color: white; font-size: 16px; border: none;
+    border-radius: 5px; cursor: pointer;
+}
+button:hover { background: #0056b3; }
+</style>
+
+<script>
+// Validate name (only letters)
+function validateName(e) {
+    let ch = String.fromCharCode(e.keyCode);
+    if (!/[a-zA-Z ]/.test(ch)) {
+        alert("Only letters allowed in Name!");
+        return false;
+    }
+}
+
+// Validate email characters
+function validateEmail(e) {
+    let ch = String.fromCharCode(e.keyCode);
+    if (!/[a-zA-Z0-9@._]/.test(ch)) {
+        alert("Invalid character for Email!");
+        return false;
+    }
+}
+
+// Double click submit confirmation
+function confirmSubmit() {
+    alert("Feedback submitted successfully!");
+}
+</script>
+</head>
+
+<body>
+<div class="container">
+    <h2>Feedback Form</h2>
+
+    <label>Name:</label>
+    <input type="text" id="name" onkeypress="return validateName(event)">
+
+    <label>Email:</label>
+    <input type="text" id="email" onkeypress="return validateEmail(event)">
+
+    <label>Feedback:</label>
+    <textarea id="fb" rows="4"></textarea>
+
+    <button ondblclick="confirmSubmit()">Submit</button>
+</div>
+</body>
+</html>
+
+RESULT
+
+Thus, an interactive web-based feedback form was successfully created using HTML, CSS, and JavaScript.User inputs were validated using keypress events, input fields were dynamically highlighted on mouse hover,
+and a confirmation message was displayed using a double-click event on the submit button. JavaScript functions were used to provide reusable and efficient validation logic.
