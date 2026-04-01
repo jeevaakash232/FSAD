@@ -1,0 +1,238 @@
+AIM:
+To develop a simple Student Record System using Spring Data JPA that performs storing, retrieving, filtering, sorting, and paginating student records using JpaRepository.
+
+PROCEDURE:
+Create a Spring Boot project with dependencies: Spring Web, Spring Data JPA, H2 Database.
+Create the Student entity using annotations like @Entity, @Id, @Column.
+Create StudentRepository extending JpaRepository to perform database operations.
+Write custom query methods (findByDepartment, findByAgeGreaterThan, sorting and pagination).
+Create StudentService & StudentController to handle business logic and REST endpoints.
+Run the application and test all operations using browser/Postman.
+
+code:
+
+StudentController.java
+
+package edu.Task_11;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+@RestController
+@RequestMapping("/students")
+public class StudentController {
+    @Autowired
+    private StudentService studentService;
+    @PostMapping
+    public Student saveStudent(@RequestBody Student student) {
+        return studentService.saveStudent(student);
+    }
+    @GetMapping
+    public List<Student> getAllStudents() {
+        return studentService.getAllStudents();
+    }
+    @GetMapping("/department/{dept}")
+    public List<Student> getByDepartment(@PathVariable String dept) {
+        return studentService.getByDepartment(dept);
+    }
+    @GetMapping("/age/{age}")
+    public List<Student> getByAge(@PathVariable int age) {
+        return studentService.getByAge(age);
+    }
+   @GetMapping("/sort")
+    public List<Student> sortByName() {
+        return studentService.sortByName();
+    }
+    @GetMapping("/page")
+    public Page<Student> getByPage(@RequestParam int page, @RequestParam int size) {
+        return studentService.getByPage(page, size);
+    }
+}
+
+Student.java
+
+package edu.Task_11;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+@RestController
+@RequestMapping("/students")
+public class StudentController {
+    @Autowired
+    private StudentService studentService;
+    @PostMapping
+    public Student saveStudent(@RequestBody Student student) {
+        return studentService.saveStudent(student);
+    }
+    @GetMapping
+    public List<Student> getAllStudents() {
+        return studentService.getAllStudents();
+    }
+    @GetMapping("/department/{dept}")
+    public List<Student> getByDepartment(@PathVariable String dept) {
+        return studentService.getByDepartment(dept);
+    }
+    @GetMapping("/age/{age}")
+    public List<Student> getByAge(@PathVariable int age) {
+        return studentService.getByAge(age);
+    }
+   @GetMapping("/sort")
+    public List<Student> sortByName() {
+        return studentService.sortByName();
+    }
+    @GetMapping("/page")
+    public Page<Student> getByPage(@RequestParam int page, @RequestParam int size) {
+        return studentService.getByPage(page, size);
+    }
+}
+
+StudentService.java
+
+package edu.Task_11;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
+@Service
+public class StudentService {
+    @Autowired
+    private StudentRepository stuRep; 
+    public List<Student> getAllStudents() {
+        return stuRep.findAll();
+    }
+    public Student saveStudent(Student student) {
+        return stuRep.save(student);
+    }
+    public List<Student> getByDepartment(String department) {
+        return stuRep.findByDepartment(department);
+    }
+    public List<Student> getByAge(int age) {
+        return stuRep.findByAgeGreaterThan(age);
+    }
+   public List<Student> sortByName() {
+        return stuRep.findAll(Sort.by("name"));
+    }
+    public Page<Student> getByPage(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return stuRep.findAll(pageable);
+    }
+}
+
+StudentRepository.java
+
+package edu.Task_11;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+public interface StudentRepository extends JpaRepository<Student, Long> {
+    List<Student> findByDepartment(String department);
+    List<Student> findByAgeGreaterThan(int age);
+    @Override
+	Page<Student> findAll(Pageable pageable);
+}
+
+MainClass
+
+package edu.Task_11;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+@SpringBootApplication
+public class Task11Application {
+	public static void main(String[] args) {
+		SpringApplication.run(Task11Application.class, args);
+	}
+
+}
+
+application.properties
+
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+pom.xml
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.3</version>
+        <relativePath/>
+    </parent>
+    <groupId>edu</groupId>
+    <artifactId>Task_11</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Task_11</name>
+    <description>Demo project for Spring Boot</description>
+    <properties>
+        <java.version>21</java.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-h2console</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+RESULT
+
+The Student Record System was successfully developed.The application can:
+Save student data
+Retrieve all students
+Filter students by department or age
+Sort students
+Paginate results
+Thus, CRUD operations and advanced queries were executed successfully using Spring Data JPA.
