@@ -1,0 +1,184 @@
+AIM:
+To develop a simple Employee Management module using Spring Core that demonstrates Inversion of Control (IoC) and Dependency Injection (DI) using Spring annotations such as @Component and @Autowired. 
+The module should use BeanFactory to manage beans and store employee data in memory.
+
+PROCEDURE:
+
+Create a Maven project and configure Spring Core by adding the spring-context dependency inside pom.xml.
+Create the package structure (edu.Task_8) and add all required classes:
+Employee.java
+EmployeeRepository.java
+EmployeeService.java
+AppConfig.java
+MainApp.java
+Create the Employee model class with fields such as id, name, and department along with getters, setters, and a toString() method.
+Develop EmployeeRepository and annotate it with @Component to enable Inversion of Control (IoC).
+Use a HashMap for in-memory storage.
+Implement methods such as save(), findById(), findAll(), and deleteById().
+Develop EmployeeService and annotate it with @Component.
+Use @Autowired for Dependency Injection (DI) to inject EmployeeRepository.
+Implement business methods such as addEmployee(), getEmployee(), getAllEmployees(), removeEmployee().
+
+Create AppConfig.java and enable component scanning using:
+
+@Configuration  
+@ComponentScan(basePackages = "edu.Task_8")
+Use BeanFactory/ApplicationContext in MainApp
+Load the Spring container using AnnotationConfigApplicationContext.
+Retrieve the EmployeeService bean, demonstrating Spring IoC.
+Add employees, fetch employees, delete records, and print results.
+Run the application, observe the stored employees, and confirm DI, IoC, add/find/delete functionalities working properly.
+
+code:
+pom.xml
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId>
+  <artifactId>spring-employee-core</artifactId>
+  <version>1.0</version>
+
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+    <!-- Spring Core + IoC container -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>5.3.30</version>
+    </dependency>
+  </dependencies>
+</project>
+
+2)Employee.java 
+
+package edu.Task_8;
+
+public class Employee {
+	private int id;
+    private String name;
+    private String department;
+
+    public Employee() { }
+
+    public Employee(int id, String name, String department) {
+        this.id = id;
+        this.name = name;
+        this.department = department;
+    }
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    @Override
+    public String toString() {
+        return "Employee{id=" + id + ", name='" + name + "', dept='" + department + "'}";
+    }
+}
+
+3) EmployeeRepository.java
+
+package edu.Task_8;
+
+import java.util.*;
+import org.springframework.stereotype.Component;
+
+@Component
+public class EmployeeRepository {
+	private final Map<Integer, Employee> store = new HashMap<>();
+
+    public void save(Employee e) {
+        store.put(e.getId(), e);
+    }
+
+    public Employee findById(int id) {
+        return store.get(id);
+    }
+
+    public List<Employee> findAll() {
+        return new ArrayList<>(store.values());
+    }
+
+    public boolean deleteById(int id) {
+        return store.remove(id) != null;
+    }
+}
+
+4) EmployeeService.java
+
+package edu.Task_8;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class EmployeeService {
+
+    private final EmployeeRepository repo; 
+    @Autowired
+    public EmployeeService(EmployeeRepository repo) {
+        this.repo = repo;
+    }
+
+    public void addEmployee(int id, String name, String dept) {
+        repo.save(new Employee(id, name, dept));
+    }
+
+    public Employee getEmployee(int id) {
+        return repo.findById(id);
+    }
+
+5)AppConfig.java 
+
+package edu.Task_8;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ComponentScan(basePackages = "edu.Task_8")
+public class AppConfig { }
+
+
+6)MainApp.java 
+
+package edu.Task_8;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+public class App 
+{
+    public static void main( String[] args )
+    {
+    	ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+    
+        EmployeeService service = context.getBean(EmployeeService.class);
+        service.addEmployee(101, "Anand", "CSE");
+        service.addEmployee(102, "Divya", "ECE");
+        service.addEmployee(103, "Ravi", "IT");
+        System.out.println("All Employees:");
+        service.getAllEmployees().forEach(System.out::println);
+        System.out.println("\nFind Employee 102:");
+        System.out.println(service.getEmployee(102));
+        System.out.println("\nDelete Employee 101:");
+        System.out.println("Deleted? " + service.removeEmployee(101));
+        System.out.println("\nAll Employees After Delete:");
+        service.getAllEmployees().forEach(System.out::println);
+    }
+}
+
+
+RESULT:
+Thus, an Employee Management Module was successfully developed using Spring Core.The concepts of Inversion of Control (IoC) and Dependency Injection (DI) were demonstrated using annotations such as @Component and @Autowired.
+The Spring BeanFactory/ApplicationContext effectively managed bean creation and injection.Employee data was stored in memory using the repository class, and operations such as add, view, search, and delete were performed successfully, validating the working of the Spring IoC container.
