@@ -1,0 +1,62 @@
+AIM:
+To simulate an online payment transaction by deducting balance from a user’s account and adding the amount to a merchant’s account using SQL transactions with COMMIT and ROLLBACK.
+
+PROCEDURE:
+Create a database and table named accounts to store user and merchant balances.
+Insert sample data for:
+User Account
+Merchant Account
+Start a SQL transaction using START TRANSACTION.
+Deduct a specified amount from the user account.
+Add the same amount to the merchant account.
+Check if the user’s balance becomes negative:
+If valid, execute COMMIT.
+If invalid, execute ROLLBACK.
+Verify the final balances after the transaction.
+
+code:
+Creating Tables
+
+CREATE TABLE accounts (
+    acc_id INT PRIMARY KEY,
+    acc_name VARCHAR(50),
+    balance DECIMAL(10,2)
+);
+
+Inserting Tables
+
+INSERT INTO accounts VALUES
+(1, 'User_Account', 5000.00),
+(2, 'Merchant_Account', 10000.00);
+
+Transaction Stimulation
+
+START TRANSACTION;
+
+-- Deduct from user
+UPDATE accounts 
+SET balance = balance - 1500
+WHERE acc_id = 1;
+
+-- Add to merchant
+UPDATE accounts 
+SET balance = balance + 1500
+WHERE acc_id = 2;
+
+-- If no errors
+COMMIT;
+
+Transaction Failure
+
+START TRANSACTION;
+
+UPDATE accounts 
+SET balance = balance - 8000
+WHERE acc_id = 1;
+
+-- Balance becomes negative → invalid transaction
+ROLLBACK;
+
+RESULT:
+Thus, the Transaction-Based Payment Simulation was successfully implemented using SQL.The user’s balance was deducted and the merchant’s balance was updated when the transaction was valid, and COMMIT was executed.
+For invalid transactions with insufficient balance, ROLLBACK ensured that no changes were made, demonstrating safe and reliable payment processing similar to real-world banking applications.
