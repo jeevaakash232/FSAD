@@ -49,7 +49,7 @@ CREATE TABLE students (
 3)insert.php
 <?php
 
-$conn = mysqli_connect("localhost", "root", "", "studentdb");
+$conn = mysqli_connect("localhost", "root", "Jeevaakash123@", "studentdb");
 
 $name = $_POST['name'];
 $email = $_POST['email'];
@@ -69,7 +69,7 @@ mysqli_close($conn);
 4)view.php
 <?php
 
-$conn = mysqli_connect("localhost", "root", "", "studentdb");
+$conn = mysqli_connect("localhost", "root", "Jeevaakash123@", "studentdb");
 
 $result = mysqli_query($conn, "SELECT * FROM students");
 
