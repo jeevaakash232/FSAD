@@ -97,7 +97,7 @@ echo "</table>";
 
 mysqli_close($conn);
 ?>
-![image alt](https://github.com/jeevaakash232/FSAD/blob/main/Screenshot%202026-04-01%20194231.png?raw=true)
+
 RESULT:
 
 Thus, the Student Registration Form was successfully created using HTML5 and CSS3.The entered student data was stored in the MySQL database table and retrieved using the SQL SELECT query.
